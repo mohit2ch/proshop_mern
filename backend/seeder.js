@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv, { config } from "dotenv";
 import users from "./data/users.js";
-import products from "./data/products.js";
+import products from "./data/products2.js";
 import User from "./models/userModel.js";
 import Product from "./models/productModel.js";
 import Order from "./models/orderModel.js";
@@ -19,10 +19,10 @@ async function importData() {
     await Product.deleteMany();
     await Order.deleteMany();
 
-    const createdUsers = User.insertMany(users);
-
+    const createdUsers = await User.insertMany(users);
+    // console.log(createdUsers);
     const adminUser = createdUsers[0]._id;
-
+    console.log(adminUser);
     const sampleProducts = products.map(function (product) {
       return { ...product, user: adminUser };
     });
@@ -31,9 +31,7 @@ async function importData() {
 
     console.log("Data Imported!".green.inverse);
     process.exit();
-  } catch {
-    error;
-  }
+  } catch (error)
   {
     console.log(`${error}`.red.inverse);
     process.exit(1);
@@ -42,9 +40,9 @@ async function importData() {
 
 async function destroyData() {
   try {
-    await Order.deleleMany({});
-    await User.deleleMany({});
-    await Product.deleteMany({});
+    await User.deleteMany();
+    await Product.deleteMany();
+    await Order.deleteMany();
     
     console.log("Data Destroyed!".red.inverse);
     process.exit();
@@ -55,7 +53,7 @@ async function destroyData() {
 }
 
 if (process.argv[2] == "-d") {
-  await destroyData();
+  destroyData();
 } else {
-  await importData();
+  importData();
 }
